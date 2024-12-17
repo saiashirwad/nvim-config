@@ -50,3 +50,11 @@ vim.diagnostic.config({
 		source = "always",
 	},
 })
+
+local organize_imports = function()
+	local params = {
+		command = "typescript.organizeImports",
+		arguments = { vim.api.nvim_buf_get_name(0) },
+	}
+	vim.lsp.buf.execute_command(params)
+end

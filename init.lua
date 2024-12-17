@@ -3,14 +3,6 @@ require("options")
 require("colors")
 require("lsp")
 
-local organize_imports = function()
-	local params = {
-		command = "typescript.organizeImports",
-		arguments = { vim.api.nvim_buf_get_name(0) },
-	}
-	vim.lsp.buf.execute_command(params)
-end
-
 require("lazy").setup({
 	"tpope/vim-sleuth",
 	"marilari88/twoslash-queries.nvim",
@@ -589,23 +581,5 @@ require("lazy").setup({
 				},
 			})
 		end,
-	},
-}, {
-	ui = {
-		icons = vim.g.have_nerd_font and {} or {
-			cmd = "⌘",
-			config = "🛠",
-			event = "📅",
-			ft = "📂",
-			init = "⚙",
-			keys = "🗝",
-			plugin = "🔌",
-			runtime = "💻",
-			require = "🌙",
-			source = "📄",
-			start = "🚀",
-			task = "📌",
-			lazy = "💤 ",
-		},
 	},
 })
