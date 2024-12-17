@@ -1,5 +1,6 @@
 require("bootstrap")
 require("options")
+require("colors")
 
 local organize_imports = function()
 	local params = {
@@ -10,35 +11,44 @@ local organize_imports = function()
 end
 
 require("lazy").setup({
-	"tpope/vim-sleuth",
-	{
-		"scalameta/nvim-metals",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-		},
-		ft = { "scala", "sbt", "java" },
-		opts = function()
-			local metals_config = require("metals").bare_config()
-			metals_config.on_attach = function(client, bufnr) end
+	-- {
+	-- 	"Mofiqul/vscode.nvim",
+	-- 	lazy = false,
+	-- 	opts = {},
+	-- 	config = function()
+	-- 		vim.cmd.colorscheme("vscode")
+	-- 	end,
+	-- },
 
-			return metals_config
+	"tpope/vim-sleuth",
+
+	{
+		"supermaven-inc/supermaven-nvim",
+		config = function()
+			require("supermaven-nvim").setup({})
 		end,
-		config = function(self, metals_config)
-			local nvim_metals_group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
-			vim.api.nvim_create_autocmd("FileType", {
-				pattern = self.ft,
-				callback = function()
-					require("metals").initialize_or_attach(metals_config)
-				end,
-				group = nvim_metals_group,
-			})
-		end,
+	},
+
+	{
+		"Julian/lean.nvim",
+		event = { "BufReadPre *.lean", "BufNewFile *.lean" },
+
+		dependencies = {
+			"neovim/nvim-lspconfig",
+			"nvim-lua/plenary.nvim",
+			-- you also will likely want nvim-cmp or some completion engine
+		},
+
+		-- see details below for full configuration options
+		opts = {
+			lsp = {},
+			mappings = true,
+		},
 	},
 
 	{ "marilari88/twoslash-queries.nvim" },
 
 	{
-
 		"folke/flash.nvim",
 		event = "VeryLazy",
 		opts = {},
@@ -123,21 +133,21 @@ require("lazy").setup({
 		},
 	},
 
-	{
-		"zenbones-theme/zenbones.nvim",
-		-- Optionally install Lush. Allows for more configuration or extending the colorscheme
-		-- If you don't want to install lush, make sure to set g:zenbones_compat = 1
-		-- In Vim, compat mode is turned on as Lush only works in Neovim.
-		dependencies = "rktjmp/lush.nvim",
-		lazy = false,
-		priority = 1000,
-		config = function()
-			vim.g.zenbones_darken_comments = 45
-			-- vim.cmd.colorscheme("zenburned")
-			vim.cmd.colorscheme("kanagawabones")
-			-- vim.cmd.colorscheme("vimbones")
-		end,
-	},
+	-- {
+	-- 	"zenbones-theme/zenbones.nvim",
+	-- 	-- Optionally install Lush. Allows for more configuration or extending the colorscheme
+	-- 	-- If you don't want to install lush, make sure to set g:zenbones_compat = 1
+	-- 	-- In Vim, compat mode is turned on as Lush only works in Neovim.
+	-- 	dependencies = "rktjmp/lush.nvim",
+	-- 	lazy = false,
+	-- 	priority = 1000,
+	-- 	config = function()
+	-- 		vim.g.zenbones_darken_comments = 45
+	-- 		-- vim.cmd.colorscheme("zenburned")
+	-- 		vim.cmd.colorscheme("kanagawabones")
+	-- 		-- vim.cmd.colorscheme("vimbones")
+	-- 	end,
+	-- },
 	{
 		"sindrets/diffview.nvim",
 		opts = {},
@@ -257,9 +267,28 @@ require("lazy").setup({
 		},
 		config = function()
 			require("telescope").setup({
+				defaults = {
+					layout_strategy = "vertical",
+					sorting_strategy = "ascending",
+					border = true,
+					prompt_prefix = "🔍 ",
+					selection_caret = "➜ ",
+					entry_prefix = "  ",
+					results_title = false,
+					borderchars = {
+						prompt = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+						results = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+						preview = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+					},
+					color_devicons = true,
+				},
 				extensions = {
 					["ui-select"] = {
-						require("telescope.themes").get_dropdown(),
+						require("telescope.themes").get_ivy({
+							borderchars = {
+								preview = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+							},
+						}),
 					},
 				},
 			})
@@ -362,15 +391,15 @@ require("lazy").setup({
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
 			local servers = {
-				lua_ls = {
-					settings = {
-						Lua = {
-							completion = {
-								callSnippet = "Replace",
-							},
-						},
-					},
-				},
+				-- lua_ls = {
+				-- 	settings = {
+				-- 		Lua = {
+				-- 			completion = {
+				-- 				callSnippet = "Replace",
+				-- 			},
+				-- 		},
+				-- 	},
+				-- },
 				vtsls = {
 					commands = {
 						OrganizeImports = {
@@ -389,6 +418,7 @@ require("lazy").setup({
 			local server_names = {
 				"html",
 				"cssls",
+				-- "nelua_lsp",
 				-- "prismals",
 				-- "svelte",
 				"jsonls",
@@ -401,6 +431,16 @@ require("lazy").setup({
 			for _, name in ipairs(server_names) do
 				servers[name] = servers[name] or {}
 			end
+
+			require("lspconfig").nelua_lsp.setup({
+				cmd = {
+					"nelua",
+					"-L",
+					"~/repos/nelua-lsp/nelua-lsp.lua",
+					"--script",
+					"~/repos/nelua-lsp/nelua-lsp.lua",
+				},
+			})
 
 			require("mason").setup()
 
@@ -526,6 +566,8 @@ require("lazy").setup({
 					end, { "i", "s" }),
 				}),
 				sources = {
+
+					{ name = "codeium" },
 					{
 						name = "lazydev",
 						group_index = 0,
@@ -745,3 +787,39 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 		require("conform").format({ bufnr = args.buf })
 	end,
 })
+
+local border = {
+	{ "╭", "FloatBorder" },
+	{ "─", "FloatBorder" },
+	{ "╮", "FloatBorder" },
+	{ "│", "FloatBorder" },
+	{ "╯", "FloatBorder" },
+	{ "─", "FloatBorder" },
+	{ "╰", "FloatBorder" },
+	{ "│", "FloatBorder" },
+}
+
+local handlers = {
+	["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border }),
+	["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }),
+}
+
+-- Add this to your LSP configuration
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border })
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border })
+
+vim.diagnostic.config({
+	float = {
+		border = border,
+		style = "full",
+		source = "always",
+	},
+})
+
+-- vim.keymap.set("i", "<C-j>", function()
+-- 	if require("copilot.suggestion").is_visible() then
+-- 		require("copilot.suggestion").accept()
+-- 	else
+-- 		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Tab>", true, false, true), "n", false)
+-- 	end
+-- end, { desc = "Accept Copilot suggestion or Tab" })
