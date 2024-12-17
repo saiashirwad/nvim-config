@@ -1,6 +1,7 @@
 require("bootstrap")
 require("options")
 require("colors")
+require("lsp")
 
 local organize_imports = function()
 	local params = {
@@ -606,69 +607,5 @@ require("lazy").setup({
 			task = "📌",
 			lazy = "💤 ",
 		},
-	},
-})
-
-if os.getenv("TERM") == "xterm-kitty" then
-	vim.g.kitty_navigator_no_mappings = 1
-	vim.g.tmux_navigator_no_mappings = 1
-
-	vim.api.nvim_set_keymap("n", "C-h", ":KittyNavigateLeft <CR>", { noremap = true, silent = true })
-	vim.api.nvim_set_keymap("n", "C-j", ":KittyNavigateDown <CR>", { noremap = true, silent = true })
-	vim.api.nvim_set_keymap("n", "C-k", ":KittyNavigateUp <CR>", { noremap = true, silent = true })
-	vim.api.nvim_set_keymap("n", "C-l", ":KittyNavigateRight <CR>", { noremap = true, silent = true })
-end
-
-vim.diagnostic.config({
-	virtual_text = false,
-	underline = false,
-	update_in_insert = false,
-	severity_sort = false,
-	signs = false,
-	virtual_text = {
-		format = function(diagnostic)
-			if vim.bo.filetype == "typescript" or vim.bo.filetype == "typescriptreact" then
-				return ""
-			end
-			return diagnostic.message
-		end,
-	},
-})
-
-vim.notify = function(msg, level, opts)
-	if msg:match("Debug Failure") or msg:match("False expression") then
-		return
-	end
-end
-
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-	pattern = "*",
-	callback = function(args)
-		require("conform").format({ bufnr = args.buf })
-	end,
-})
-
-local border = {
-	{ "╭", "FloatBorder" },
-	{ "─", "FloatBorder" },
-	{ "╮", "FloatBorder" },
-	{ "│", "FloatBorder" },
-	{ "╯", "FloatBorder" },
-	{ "─", "FloatBorder" },
-	{ "╰", "FloatBorder" },
-	{ "│", "FloatBorder" },
-}
-
-vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border })
-vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border })
-
-vim.diagnostic.config({
-	float = {
-		border = border,
-		style = "full",
-		source = "always",
 	},
 })
