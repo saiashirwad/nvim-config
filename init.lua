@@ -37,11 +37,46 @@ require("lazy").setup({
 		event = "VeryLazy",
 		opts = {},
 		keys = {
-			{ "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
-			{ "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
-			{ "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-			{ "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-			{ "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+			{
+				"s",
+				mode = { "n", "x", "o" },
+				function()
+					require("flash").jump()
+				end,
+				desc = "Flash",
+			},
+			{
+				"S",
+				mode = { "n", "x", "o" },
+				function()
+					require("flash").treesitter()
+				end,
+				desc = "Flash Treesitter",
+			},
+			{
+				"r",
+				mode = "o",
+				function()
+					require("flash").remote()
+				end,
+				desc = "Remote Flash",
+			},
+			{
+				"R",
+				mode = { "o", "x" },
+				function()
+					require("flash").treesitter_search()
+				end,
+				desc = "Treesitter Search",
+			},
+			{
+				"<c-s>",
+				mode = { "c" },
+				function()
+					require("flash").toggle()
+				end,
+				desc = "Toggle Flash Search",
+			},
 		},
 	},
 
@@ -53,7 +88,11 @@ require("lazy").setup({
 			{ "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
 			{ "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
 			{ "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Symbols (Trouble)" },
-			{ "<leader>cl", "<cmd>Trouble lsp toggle focus=false win.position=right<cr>", desc = "LSP Definitions / references / ... (Trouble)" },
+			{
+				"<leader>cl",
+				"<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+				desc = "LSP Definitions / references / ... (Trouble)",
+			},
 			{ "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
 			{ "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
 		},
@@ -222,61 +261,72 @@ require("lazy").setup({
 			"williamboman/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 			{ "j-hui/fidget.nvim", opts = {} },
-			"hrsh7th/cmp-nvim-lsp",
+			-- "hrsh7th/cmp-nvim-lsp",
 		},
 		config = function()
+			local function setup_keymaps(bufnr)
+				local map = function(keys, func, desc, mode)
+					mode = mode or "n"
+					vim.keymap.set(mode, keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
+				end
+
+				map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+				map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+				map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+				map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
+				map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
+				map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+				map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
+				map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction", { "n", "x" })
+				map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+			end
+
+			local function setup_highlight(client, bufnr)
+				if client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+					local highlight_augroup = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
+					vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+						buffer = bufnr,
+						group = highlight_augroup,
+						callback = vim.lsp.buf.document_highlight,
+					})
+
+					vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+						buffer = bufnr,
+						group = highlight_augroup,
+						callback = vim.lsp.buf.clear_references,
+					})
+
+					vim.api.nvim_create_autocmd("LspDetach", {
+						group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
+						callback = function(event)
+							vim.lsp.buf.clear_references()
+							vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event.buf })
+						end,
+					})
+				end
+			end
+
+			local function setup_inlay_hints(client, bufnr)
+				if client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+					vim.keymap.set("n", "<leader>th", function()
+						vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }))
+					end, { buffer = bufnr, desc = "[T]oggle Inlay [H]ints" })
+				end
+			end
+
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
 				callback = function(event)
-					local map = function(keys, func, desc, mode)
-						mode = mode or "n"
-						vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
-					end
-
-					map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
-					map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
-					map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
-					map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
-					map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-					map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
-					map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-					map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction", { "n", "x" })
-					map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-
+					local bufnr = event.buf
 					local client = vim.lsp.get_client_by_id(event.data.client_id)
-					if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
-						local highlight_augroup = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
-						vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-							buffer = event.buf,
-							group = highlight_augroup,
-							callback = vim.lsp.buf.document_highlight,
-						})
-
-						vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-							buffer = event.buf,
-							group = highlight_augroup,
-							callback = vim.lsp.buf.clear_references,
-						})
-
-						vim.api.nvim_create_autocmd("LspDetach", {
-							group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
-							callback = function(event2)
-								vim.lsp.buf.clear_references()
-								vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event2.buf })
-							end,
-						})
-					end
-
-					if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-						map("<leader>th", function()
-							vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
-						end, "[T]oggle Inlay [H]ints")
-					end
+					setup_keymaps(bufnr)
+					setup_highlight(client, bufnr)
+					setup_inlay_hints(client, bufnr)
 				end,
 			})
 
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+			-- capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
 			local servers = {
 				vtsls = {
@@ -373,60 +423,75 @@ require("lazy").setup({
 	},
 
 	{
-		"hrsh7th/nvim-cmp",
+		"ms-jpq/coq_nvim",
+		branch = "coq",
 		event = "InsertEnter",
 		dependencies = {
-			{
-				"L3MON4D3/LuaSnip",
-				build = (function()
-					if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
-						return
-					end
-					return "make install_jsregexp"
-				end)(),
-			},
-			"saadparwaiz1/cmp_luasnip",
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-path",
+			{ "ms-jpq/coq.artifacts", branch = "artifacts" },
+			{ "ms-jpq/coq.thirdparty", branch = "3p" },
 		},
 		config = function()
-			local cmp = require("cmp")
-			local luasnip = require("luasnip")
-			luasnip.config.setup({})
+			vim.g.coq_settings = {
+				auto_start = false,
+				keymap = {
+					jump_to_mark = "<C-l>",
+					pre_select = true,
+					recommended = false,
+					manual_complete = "<C-Space>",
+					bigger_preview = "<C-b>",
+					manual_complete_insertion_only = true,
+				},
+				clients = {
+					snippets = {
+						enabled = true,
+						warn = {},
+					},
+					tree_sitter = {
+						enabled = true,
+						weight_adjust = 1.0,
+					},
+					tags = { enabled = true },
+					buffers = { enabled = true },
+				},
+			}
 
-			cmp.setup({
-				snippet = {
-					expand = function(args)
-						luasnip.lsp_expand(args.body)
-					end,
-				},
-				completion = { completeopt = "menu,menuone,noinsert" },
-				mapping = cmp.mapping.preset.insert({
-					["<C-n>"] = cmp.mapping.select_next_item(),
-					["<C-p>"] = cmp.mapping.select_prev_item(),
-					["<C-b>"] = cmp.mapping.scroll_docs(-4),
-					["<C-f>"] = cmp.mapping.scroll_docs(4),
-					["<CR>"] = cmp.mapping.confirm({ select = true }),
-					["<C-Space>"] = cmp.mapping.complete({}),
-					["<C-l>"] = cmp.mapping(function()
-						if luasnip.expand_or_locally_jumpable() then
-							luasnip.expand_or_jump()
-						end
-					end, { "i", "s" }),
-					["<C-h>"] = cmp.mapping(function()
-						if luasnip.locally_jumpable(-1) then
-							luasnip.jump(-1)
-						end
-					end, { "i", "s" }),
-				}),
-				sources = {
-					{ name = "codeium" },
-					{ name = "lazydev", group_index = 0 },
-					{ name = "nvim_lsp", max_item_count = 8 },
-					{ name = "luasnip" },
-					{ name = "path" },
-				},
-			})
+			vim.cmd("COQnow -s")
+
+			local remap = vim.api.nvim_set_keymap
+			local npairs = require("nvim-autopairs")
+
+			npairs.setup({ map_bs = false, map_cr = false })
+
+			-- These mappings are coq recommended mappings unrelated to nvim-autopairs
+			remap("i", "<esc>", [[pumvisible() ? "<c-e><esc>" : "<esc>"]], { expr = true, noremap = true })
+			remap("i", "<c-c>", [[pumvisible() ? "<c-e><c-c>" : "<c-c>"]], { expr = true, noremap = true })
+			remap("i", "<tab>", [[pumvisible() ? "<c-n>" : "<tab>"]], { expr = true, noremap = true })
+			remap("i", "<s-tab>", [[pumvisible() ? "<c-p>" : "<bs>"]], { expr = true, noremap = true })
+
+			-- skip it, if you use another global object
+			_G.MiniPairs = {}
+
+			MiniPairs.cr = function()
+				if vim.fn.pumvisible() ~= 0 then
+					if vim.fn.complete_info({ "selected" }).selected ~= -1 then
+						return npairs.esc("<c-y>")
+					else
+						return npairs.esc("<c-e>") .. npairs.autopairs_cr()
+					end
+				else
+					return npairs.autopairs_cr()
+				end
+			end
+			remap("i", "<cr>", "v:lua.MiniPairs.cr()", { expr = true, noremap = true })
+
+			MiniPairs.bs = function()
+				if vim.fn.pumvisible() ~= 0 and vim.fn.complete_info({ "mode" }).mode == "eval" then
+					return npairs.esc("<c-e>") .. npairs.autopairs_bs()
+				else
+					return npairs.autopairs_bs()
+				end
+			end
+			remap("i", "<bs>", "v:lua.MiniPairs.bs()", { expr = true, noremap = true })
 		end,
 	},
 
