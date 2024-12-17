@@ -1,5 +1,6 @@
 require("bootstrap")
 require("options")
+require("colors")
 
 local organize_imports = function()
 	local params = {
@@ -11,34 +12,27 @@ end
 
 require("lazy").setup({
 	"tpope/vim-sleuth",
+	"marilari88/twoslash-queries.nvim",
 	{
-		"scalameta/nvim-metals",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-		},
-		ft = { "scala", "sbt", "java" },
-		opts = function()
-			local metals_config = require("metals").bare_config()
-			metals_config.on_attach = function(client, bufnr) end
-
-			return metals_config
-		end,
-		config = function(self, metals_config)
-			local nvim_metals_group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
-			vim.api.nvim_create_autocmd("FileType", {
-				pattern = self.ft,
-				callback = function()
-					require("metals").initialize_or_attach(metals_config)
-				end,
-				group = nvim_metals_group,
-			})
+		"supermaven-inc/supermaven-nvim",
+		config = function()
+			require("supermaven-nvim").setup({})
 		end,
 	},
-
-	{ "marilari88/twoslash-queries.nvim" },
+	{
+		"Julian/lean.nvim",
+		event = { "BufReadPre *.lean", "BufNewFile *.lean" },
+		dependencies = {
+			"neovim/nvim-lspconfig",
+			"nvim-lua/plenary.nvim",
+		},
+		opts = {
+			lsp = {},
+			mappings = true,
+		},
+	},
 
 	{
-
 		"folke/flash.nvim",
 		event = "VeryLazy",
 		opts = {},
@@ -85,59 +79,25 @@ require("lazy").setup({
 			},
 		},
 	},
+
 	{
 		"folke/trouble.nvim",
-		opts = {}, -- for default options, refer to the configuration section for custom setup.
+		opts = {},
 		cmd = "Trouble",
 		keys = {
-			{
-				"<leader>xx",
-				"<cmd>Trouble diagnostics toggle<cr>",
-				desc = "Diagnostics (Trouble)",
-			},
-			{
-				"<leader>xX",
-				"<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-				desc = "Buffer Diagnostics (Trouble)",
-			},
-			{
-				"<leader>cs",
-				"<cmd>Trouble symbols toggle focus=false<cr>",
-				desc = "Symbols (Trouble)",
-			},
+			{ "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
+			{ "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+			{ "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Symbols (Trouble)" },
 			{
 				"<leader>cl",
 				"<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
 				desc = "LSP Definitions / references / ... (Trouble)",
 			},
-			{
-				"<leader>xL",
-				"<cmd>Trouble loclist toggle<cr>",
-				desc = "Location List (Trouble)",
-			},
-			{
-				"<leader>xQ",
-				"<cmd>Trouble qflist toggle<cr>",
-				desc = "Quickfix List (Trouble)",
-			},
+			{ "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
+			{ "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
 		},
 	},
 
-	{
-		"zenbones-theme/zenbones.nvim",
-		-- Optionally install Lush. Allows for more configuration or extending the colorscheme
-		-- If you don't want to install lush, make sure to set g:zenbones_compat = 1
-		-- In Vim, compat mode is turned on as Lush only works in Neovim.
-		dependencies = "rktjmp/lush.nvim",
-		lazy = false,
-		priority = 1000,
-		config = function()
-			vim.g.zenbones_darken_comments = 45
-			-- vim.cmd.colorscheme("zenburned")
-			vim.cmd.colorscheme("kanagawabones")
-			-- vim.cmd.colorscheme("vimbones")
-		end,
-	},
 	{
 		"sindrets/diffview.nvim",
 		opts = {},
@@ -146,23 +106,12 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>dO", "<cmd>DiffviewClose<CR>")
 		end,
 	},
+
 	{
 		"windwp/nvim-ts-autotag",
-		opts = {
-
-			opts = {
-				-- Defaults
-				enable_close = true, -- Auto close tags
-				enable_rename = true, -- Auto rename pairs of tags
-				enable_close_on_slash = true, -- Auto close on trailing </
-			},
-			per_filetype = {
-				["html"] = {
-					enable_close = false,
-				},
-			},
-		},
+		opts = {},
 	},
+
 	{
 		"max397574/better-escape.nvim",
 		event = "InsertEnter",
@@ -176,23 +125,16 @@ require("lazy").setup({
 		lazy = false,
 		event = "BufRead",
 		opts = {},
-		keys = {
-			{ "<leader>sr", "<cmd>Spectre<CR>" },
-		},
+		keys = { { "<leader>sr", "<cmd>Spectre<CR>" } },
 	},
+
 	{ "duane9/nvim-rg" },
+
 	{
 		"stevearc/oil.nvim",
 		opts = {
-			view_options = {
-				show_hidden = true,
-				icons = false,
-			},
-			float = {
-				padding = 0,
-				max_width = 30,
-				max_height = 30,
-			},
+			view_options = { show_hidden = true, icons = false },
+			float = { padding = 0, max_width = 30, max_height = 30 },
 		},
 		keys = function()
 			local oil = require("oil")
@@ -202,11 +144,10 @@ require("lazy").setup({
 			}
 		end,
 	},
+
 	{
 		"kdheepak/lazygit.nvim",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-		},
+		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function()
 			vim.keymap.set("n", "<leader>lg", "<cmd>LazyGit<CR>")
 		end,
@@ -217,8 +158,8 @@ require("lazy").setup({
 		event = "InsertEnter",
 		config = true,
 	},
-	{
 
+	{
 		"mfussenegger/nvim-lint",
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()
@@ -238,6 +179,7 @@ require("lazy").setup({
 			})
 		end,
 	},
+
 	{
 		"nvim-telescope/telescope.nvim",
 		event = "VimEnter",
@@ -252,14 +194,32 @@ require("lazy").setup({
 				end,
 			},
 			{ "nvim-telescope/telescope-ui-select.nvim" },
-
 			{ "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
 		},
 		config = function()
 			require("telescope").setup({
+				defaults = {
+					layout_strategy = "vertical",
+					sorting_strategy = "ascending",
+					border = true,
+					prompt_prefix = "🔍 ",
+					selection_caret = "➜ ",
+					entry_prefix = "  ",
+					results_title = false,
+					borderchars = {
+						prompt = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+						results = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+						preview = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+					},
+					color_devicons = true,
+				},
 				extensions = {
 					["ui-select"] = {
-						require("telescope.themes").get_dropdown(),
+						require("telescope.themes").get_ivy({
+							borderchars = {
+								preview = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+							},
+						}),
 					},
 				},
 			})
@@ -291,7 +251,9 @@ require("lazy").setup({
 			},
 		},
 	},
+
 	{ "Bilal2453/luvit-meta", lazy = true },
+
 	{
 		"neovim/nvim-lspconfig",
 		dependencies = {
@@ -305,7 +267,6 @@ require("lazy").setup({
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
 				callback = function(event)
-					--
 					local map = function(keys, func, desc, mode)
 						mode = mode or "n"
 						vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
@@ -362,15 +323,6 @@ require("lazy").setup({
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
 			local servers = {
-				lua_ls = {
-					settings = {
-						Lua = {
-							completion = {
-								callSnippet = "Replace",
-							},
-						},
-					},
-				},
 				vtsls = {
 					commands = {
 						OrganizeImports = {
@@ -380,34 +332,30 @@ require("lazy").setup({
 				},
 			}
 
-			-- require("lspconfig")["tsserver"].setup({
-			-- 	on_attach = function(client, bufnr)
-			-- 		require("twoslash-queries").attach(client, bufnr)
-			-- 	end,
-			-- })
-
 			local server_names = {
 				"html",
 				"cssls",
-				-- "prismals",
-				-- "svelte",
 				"jsonls",
-				-- "astro",
-				-- "purescriptls",
-				-- "hls",
-				-- "rescriptls",
 			}
 
 			for _, name in ipairs(server_names) do
 				servers[name] = servers[name] or {}
 			end
 
+			require("lspconfig").nelua_lsp.setup({
+				cmd = {
+					"nelua",
+					"-L",
+					"~/repos/nelua-lsp/nelua-lsp.lua",
+					"--script",
+					"~/repos/nelua-lsp/nelua-lsp.lua",
+				},
+			})
+
 			require("mason").setup()
 
 			local ensure_installed = vim.tbl_keys(servers or {})
-			vim.list_extend(ensure_installed, {
-				"stylua", -- Used to format Lua code
-			})
+			vim.list_extend(ensure_installed, { "stylua" })
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 			require("mason-lspconfig").setup({
@@ -480,10 +428,8 @@ require("lazy").setup({
 					end
 					return "make install_jsregexp"
 				end)(),
-				dependencies = {},
 			},
 			"saadparwaiz1/cmp_luasnip",
-
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-path",
 		},
@@ -493,27 +439,19 @@ require("lazy").setup({
 			luasnip.config.setup({})
 
 			cmp.setup({
-
 				snippet = {
 					expand = function(args)
 						luasnip.lsp_expand(args.body)
 					end,
 				},
 				completion = { completeopt = "menu,menuone,noinsert" },
-
-				--
 				mapping = cmp.mapping.preset.insert({
 					["<C-n>"] = cmp.mapping.select_next_item(),
 					["<C-p>"] = cmp.mapping.select_prev_item(),
-
 					["<C-b>"] = cmp.mapping.scroll_docs(-4),
 					["<C-f>"] = cmp.mapping.scroll_docs(4),
-
 					["<CR>"] = cmp.mapping.confirm({ select = true }),
-
 					["<C-Space>"] = cmp.mapping.complete({}),
-
-					--
 					["<C-l>"] = cmp.mapping(function()
 						if luasnip.expand_or_locally_jumpable() then
 							luasnip.expand_or_jump()
@@ -526,10 +464,8 @@ require("lazy").setup({
 					end, { "i", "s" }),
 				}),
 				sources = {
-					{
-						name = "lazydev",
-						group_index = 0,
-					},
+					{ name = "codeium" },
+					{ name = "lazydev", group_index = 0 },
 					{ name = "nvim_lsp", max_item_count = 8 },
 					{ name = "luasnip" },
 					{ name = "path" },
@@ -537,16 +473,6 @@ require("lazy").setup({
 			})
 		end,
 	},
-
-	-- {
-	-- 	"folke/tokyonight.nvim",
-	-- 	priority = 1000, -- Make sure to load this before all the other start plugins.
-	-- 	init = function()
-	-- 		vim.cmd.colorscheme("tokyonight-night")
-	--
-	-- 		vim.cmd.hi("Comment gui=none")
-	-- 	end,
-	-- },
 
 	{
 		"folke/todo-comments.nvim",
@@ -584,16 +510,13 @@ require("lazy").setup({
 		"echasnovski/mini.nvim",
 		config = function()
 			require("mini.ai").setup({ n_lines = 500 })
-
-			-- local statusline = require("mini.statusline")
-			-- statusline.setup({ use_icons = vim.g.have_nerd_font })
 		end,
 	},
 
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
-		main = "nvim-treesitter.configs", -- Sets main module to use for opts
+		main = "nvim-treesitter.configs",
 		opts = {
 			ensure_installed = {
 				"bash",
@@ -631,16 +554,14 @@ require("lazy").setup({
 		"LintaoAmons/cd-project.nvim",
 		tag = "v0.6.1",
 		lazy = false,
-		keys = {
-			{ "<leader>cd", "<cmd>CdProject<CR>" },
-		},
+		keys = { { "<leader>cd", "<cmd>CdProject<CR>" } },
 		config = function()
 			require("cd-project").setup({
 				projects_config_filepath = vim.fs.normalize(vim.fn.stdpath("config") .. "/cd-project.nvim.json"),
 				project_dir_pattern = { ".git", ".gitignore", "Cargo.toml", "package.json", "go.mod" },
-				choice_format = "both", -- optional, you can switch to "name" or "path"
-				projects_picker = "vim-ui", -- optional, you can switch to `telescope`
-				auto_register_project = false, -- optional, toggle on/off the auto add project behaviour
+				choice_format = "both",
+				projects_picker = "vim-ui",
+				auto_register_project = false,
 				hooks = {
 					{
 						callback = function(dir)
@@ -655,12 +576,12 @@ require("lazy").setup({
 					{
 						callback = function(dir)
 							vim.notify("switched to dir: " .. dir)
-						end, -- required, action when trigger the hook
-						name = "cd hint", -- optional
-						order = 1, -- optional, the exection order if there're multiple hooks to be trigger at one point
-						pattern = "cd-project.nvim", -- optional, trigger hook if contains pattern
-						trigger_point = "DISABLE", -- optional, enum of trigger_points, default to `AFTER_CD`
-						match_rule = function(dir) -- optional, a function return bool. if have this fields, then pattern will be ignored
+						end,
+						name = "cd hint",
+						order = 1,
+						pattern = "cd-project.nvim",
+						trigger_point = "DISABLE",
+						match_rule = function(dir)
 							return true
 						end,
 					},
@@ -704,7 +625,6 @@ vim.diagnostic.config({
 	update_in_insert = false,
 	severity_sort = false,
 	signs = false,
-
 	virtual_text = {
 		format = function(diagnostic)
 			if vim.bo.filetype == "typescript" or vim.bo.filetype == "typescriptreact" then
@@ -715,25 +635,10 @@ vim.diagnostic.config({
 	},
 })
 
--- vim.diagnostic.config({
---   virtual_text = false,
---   -- Or disable only for typescript files
---   virtual_text = {
---     format = function(diagnostic)
---       if vim.bo.filetype == "typescript" or vim.bo.filetype == "typescriptreact" then
---         return ""
---       end
---       return diagnostic.message
---     end,
---   }
--- })
-
 vim.notify = function(msg, level, opts)
-	-- Filter out the specific TypeScript debug failure messages
 	if msg:match("Debug Failure") or msg:match("False expression") then
 		return
 	end
-	-- require("vim.notify")(msg, level, opts)
 end
 
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
@@ -744,4 +649,26 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 	callback = function(args)
 		require("conform").format({ bufnr = args.buf })
 	end,
+})
+
+local border = {
+	{ "╭", "FloatBorder" },
+	{ "─", "FloatBorder" },
+	{ "╮", "FloatBorder" },
+	{ "│", "FloatBorder" },
+	{ "╯", "FloatBorder" },
+	{ "─", "FloatBorder" },
+	{ "╰", "FloatBorder" },
+	{ "│", "FloatBorder" },
+}
+
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border })
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border })
+
+vim.diagnostic.config({
+	float = {
+		border = border,
+		style = "full",
+		source = "always",
+	},
 })
