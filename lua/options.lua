@@ -2,6 +2,7 @@ vim.g.have_nerd_font = true
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+vim.cmd([[ set title ]])
 vim.opt.fillchars = { eob = " " }
 vim.opt.breakindent = true
 vim.opt.clipboard = "unnamedplus"

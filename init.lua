@@ -1,17 +1,60 @@
 require("bootstrap")
 require("options")
-require("colors")
-require("lsp")
+
+local organize_imports = function()
+	local params = {
+		command = "typescript.organizeImports",
+		arguments = { vim.api.nvim_buf_get_name(0) },
+	}
+	vim.lsp.buf.execute_command(params)
+end
 
 require("lazy").setup({
 	"tpope/vim-sleuth",
-	"marilari88/twoslash-queries.nvim",
+
 	{
-		"supermaven-inc/supermaven-nvim",
+		"folke/tokyonight.nvim",
+		lazy = false,
+		priority = 1000,
+		opts = {
+			on_highlights = function(hl, c)
+				local prompt = "#2d3149"
+				hl.TelescopeNormal = {
+					bg = c.bg_dark,
+					fg = c.fg_dark,
+				}
+				hl.TelescopeBorder = {
+					bg = c.bg_dark,
+					fg = c.bg_dark,
+				}
+				hl.TelescopePromptNormal = {
+					bg = prompt,
+				}
+				hl.TelescopePromptBorder = {
+					bg = prompt,
+					fg = prompt,
+				}
+				hl.TelescopePromptTitle = {
+					bg = prompt,
+					fg = prompt,
+				}
+				hl.TelescopePreviewTitle = {
+					bg = c.bg_dark,
+					fg = c.bg_dark,
+				}
+				hl.TelescopeResultsTitle = {
+					bg = c.bg_dark,
+					fg = c.bg_dark,
+				}
+			end,
+		},
 		config = function()
-			require("supermaven-nvim").setup({})
+			vim.cmd([[ colorscheme tokyonight-night ]])
 		end,
 	},
+
+	"marilari88/twoslash-queries.nvim",
+
 	{
 		"Julian/lean.nvim",
 		event = { "BufReadPre *.lean", "BufNewFile *.lean" },
@@ -193,11 +236,11 @@ require("lazy").setup({
 			require("telescope").setup({
 				defaults = {
 					layout_strategy = "vertical",
-					sorting_strategy = "ascending",
+					-- sorting_strategy = "ascending",
 					border = true,
-					prompt_prefix = "🔍 ",
-					selection_caret = "➜ ",
-					entry_prefix = "  ",
+					-- prompt_prefix = "🔍 ",
+					-- selection_caret = "➜ ",
+					-- entry_prefix = "  ",
 					results_title = false,
 					borderchars = {
 						prompt = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
@@ -254,7 +297,7 @@ require("lazy").setup({
 			"williamboman/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 			{ "j-hui/fidget.nvim", opts = {} },
-			"hrsh7th/cmp-nvim-lsp",
+			-- "hrsh7th/cmp-nvim-lsp",
 		},
 		config = function()
 			vim.api.nvim_create_autocmd("LspAttach", {
@@ -503,6 +546,10 @@ require("lazy").setup({
 		"echasnovski/mini.nvim",
 		config = function()
 			require("mini.ai").setup({ n_lines = 500 })
+			require("mini.tabline").setup({
+				show_icons = false,
+			})
+			require("mini.statusline").setup({})
 		end,
 	},
 
@@ -582,4 +629,98 @@ require("lazy").setup({
 			})
 		end,
 	},
+}, {
+	ui = {
+		icons = vim.g.have_nerd_font and {} or {
+			cmd = "⌘",
+			config = "🛠",
+			event = "📅",
+			ft = "📂",
+			init = "⚙",
+			keys = "🗝",
+			plugin = "🔌",
+			runtime = "💻",
+			require = "🌙",
+			source = "📄",
+			start = "🚀",
+			task = "📌",
+			lazy = "💤 ",
+		},
+	},
 })
+
+if os.getenv("TERM") == "xterm-kitty" then
+	vim.g.kitty_navigator_no_mappings = 1
+	vim.g.tmux_navigator_no_mappings = 1
+
+	vim.api.nvim_set_keymap("n", "C-h", ":KittyNavigateLeft <CR>", { noremap = true, silent = true })
+	vim.api.nvim_set_keymap("n", "C-j", ":KittyNavigateDown <CR>", { noremap = true, silent = true })
+	vim.api.nvim_set_keymap("n", "C-k", ":KittyNavigateUp <CR>", { noremap = true, silent = true })
+	vim.api.nvim_set_keymap("n", "C-l", ":KittyNavigateRight <CR>", { noremap = true, silent = true })
+end
+
+vim.diagnostic.config({
+	virtual_text = false,
+	underline = false,
+	update_in_insert = false,
+	severity_sort = false,
+	signs = false,
+	virtual_text = {
+		format = function(diagnostic)
+			if vim.bo.filetype == "typescript" or vim.bo.filetype == "typescriptreact" then
+				return ""
+			end
+			return diagnostic.message
+		end,
+	},
+})
+
+vim.notify = function(msg, level, opts)
+	if msg:match("Debug Failure") or msg:match("False expression") then
+		return
+	end
+end
+
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+	pattern = "*",
+	callback = function(args)
+		require("conform").format({ bufnr = args.buf })
+	end,
+})
+
+local border = {
+	{ "╭", "FloatBorder" },
+	{ "─", "FloatBorder" },
+	{ "╮", "FloatBorder" },
+	{ "│", "FloatBorder" },
+	{ "╯", "FloatBorder" },
+	{ "─", "FloatBorder" },
+	{ "╰", "FloatBorder" },
+	{ "│", "FloatBorder" },
+}
+
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border })
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border })
+
+vim.diagnostic.config({
+	float = {
+		border = border,
+		style = "full",
+		source = "always",
+	},
+})
+
+vim.keymap.set("n", "<leader>gh", function()
+	vim.cmd([[e ~/.config/ghostty/config]])
+end)
+
+vim.keymap.set("n", "<tab>", function()
+	vim.cmd("bn")
+end)
+
+vim.keymap.set("n", "<s-tab>", function()
+	vim.cmd("bp")
+end)
