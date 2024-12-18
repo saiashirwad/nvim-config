@@ -1,5 +1,47 @@
-require("bootstrap")
-require("options")
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+	local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+	if vim.v.shell_error ~= 0 then
+		error("Error cloning lazy.nvim:\n" .. out)
+	end
+end ---@diagnostic disable-next-line: undefined-field
+vim.opt.rtp:prepend(lazypath)
+
+vim.g.have_nerd_font = true
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
+vim.opt.title = true
+vim.opt.fillchars = { eob = " " }
+vim.opt.breakindent = true
+vim.opt.clipboard = "unnamedplus"
+vim.opt.cursorline = false
+vim.opt.cursorlineopt = "line"
+vim.opt.expandtab = true
+vim.opt.hlsearch = false
+vim.opt.ignorecase = true
+vim.opt.inccommand = "split"
+vim.opt.list = false
+vim.opt.mouse = "a"
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.scrolloff = 6
+vim.opt.shiftwidth = 2
+vim.opt.showmode = false
+vim.opt.signcolumn = "no"
+vim.opt.smartcase = true
+vim.opt.softtabstop = 2
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.swapfile = false
+vim.opt.tabstop = 2
+vim.opt.termguicolors = true
+vim.opt.timeoutlen = 300
+vim.opt.undofile = true
+vim.opt.updatetime = 250
+vim.opt.wrap = false
+vim.opt.laststatus = 0
 
 local organize_imports = function()
 	local params = {
@@ -16,44 +58,11 @@ require("lazy").setup({
 		"folke/tokyonight.nvim",
 		lazy = false,
 		priority = 1000,
-		opts = {
-			on_highlights = function(hl, c)
-				local prompt = "#2d3149"
-				hl.TelescopeNormal = {
-					bg = c.bg_dark,
-					fg = c.fg_dark,
-				}
-				hl.TelescopeBorder = {
-					bg = c.bg_dark,
-					fg = c.bg_dark,
-				}
-				hl.TelescopePromptNormal = {
-					bg = prompt,
-				}
-				hl.TelescopePromptBorder = {
-					bg = prompt,
-					fg = prompt,
-				}
-				hl.TelescopePromptTitle = {
-					bg = prompt,
-					fg = prompt,
-				}
-				hl.TelescopePreviewTitle = {
-					bg = c.bg_dark,
-					fg = c.bg_dark,
-				}
-				hl.TelescopeResultsTitle = {
-					bg = c.bg_dark,
-					fg = c.bg_dark,
-				}
-			end,
-		},
+		opts = {},
 		config = function()
 			vim.cmd([[ colorscheme tokyonight-night ]])
 		end,
 	},
-
-	"marilari88/twoslash-queries.nvim",
 
 	{
 		"Julian/lean.nvim",
@@ -235,27 +244,13 @@ require("lazy").setup({
 		config = function()
 			require("telescope").setup({
 				defaults = {
-					layout_strategy = "vertical",
-					-- sorting_strategy = "ascending",
-					border = true,
-					-- prompt_prefix = "🔍 ",
-					-- selection_caret = "➜ ",
-					-- entry_prefix = "  ",
-					results_title = false,
-					borderchars = {
-						prompt = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
-						results = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
-						preview = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
-					},
-					color_devicons = true,
+					prompt_prefix = "🔍 ",
+					selection_caret = "➜ ",
+					entry_prefix = "  ",
 				},
 				extensions = {
 					["ui-select"] = {
-						require("telescope.themes").get_ivy({
-							borderchars = {
-								preview = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
-							},
-						}),
+						require("telescope.themes"),
 					},
 				},
 			})
@@ -297,7 +292,7 @@ require("lazy").setup({
 			"williamboman/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 			{ "j-hui/fidget.nvim", opts = {} },
-			-- "hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/cmp-nvim-lsp",
 		},
 		config = function()
 			vim.api.nvim_create_autocmd("LspAttach", {
@@ -629,6 +624,51 @@ require("lazy").setup({
 			})
 		end,
 	},
+
+	{
+		"zbirenbaum/copilot.lua",
+		cmd = "Copilot",
+		event = "InsertEnter",
+		lazy = false,
+		config = function()
+			require("copilot").setup({
+				panel = {
+					enabled = true,
+					auto_refresh = true,
+					keymap = {
+						jump_prev = "[[",
+						jump_next = "]]",
+						accept = "<CR>",
+						refresh = "gr",
+						open = "<M-CR>",
+					},
+				},
+				suggestion = {
+					enabled = true,
+					auto_trigger = true,
+					debounce = 75,
+					keymap = {
+						accept = "<CR>",
+						accept_word = false,
+						accept_line = false,
+						next = "<M-]>",
+						prev = "<M-[>",
+						dismiss = "<C-]>",
+					},
+				},
+				filetypes = {
+					yaml = false,
+					help = false,
+					gitcommit = false,
+					gitrebase = false,
+					hgcommit = false,
+					svn = false,
+					cvs = false,
+					["."] = false,
+				},
+			})
+		end,
+	},
 }, {
 	ui = {
 		icons = vim.g.have_nerd_font and {} or {
@@ -649,23 +689,25 @@ require("lazy").setup({
 	},
 })
 
-if os.getenv("TERM") == "xterm-kitty" then
-	vim.g.kitty_navigator_no_mappings = 1
-	vim.g.tmux_navigator_no_mappings = 1
+local signs = {
+	Error = " ",
+	Warn = " ",
+	Hint = " ",
+	Info = " ",
+}
 
-	vim.api.nvim_set_keymap("n", "C-h", ":KittyNavigateLeft <CR>", { noremap = true, silent = true })
-	vim.api.nvim_set_keymap("n", "C-j", ":KittyNavigateDown <CR>", { noremap = true, silent = true })
-	vim.api.nvim_set_keymap("n", "C-k", ":KittyNavigateUp <CR>", { noremap = true, silent = true })
-	vim.api.nvim_set_keymap("n", "C-l", ":KittyNavigateRight <CR>", { noremap = true, silent = true })
+for type, icon in pairs(signs) do
+	local hl = "DiagnosticSign" .. type
+	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
 
 vim.diagnostic.config({
-	virtual_text = false,
 	underline = false,
 	update_in_insert = false,
 	severity_sort = false,
 	signs = false,
 	virtual_text = {
+		prefix = "🥺",
 		format = function(diagnostic)
 			if vim.bo.filetype == "typescript" or vim.bo.filetype == "typescriptreact" then
 				return ""
@@ -704,14 +746,6 @@ local border = {
 
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border })
 vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border })
-
-vim.diagnostic.config({
-	float = {
-		border = border,
-		style = "full",
-		source = "always",
-	},
-})
 
 vim.keymap.set("n", "<leader>gh", function()
 	vim.cmd([[e ~/.config/ghostty/config]])
