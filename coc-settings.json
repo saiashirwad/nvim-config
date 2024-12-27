@@ -33,5 +33,23 @@
   "coc.preferences.formatOnSave": true,
   "diagnostic.virtualText": false,
   "typescript.showUnused": true,
-  "biome.requireConfiguration": true
+  "biome.requireConfiguration": true,
+  "suggest.floatConfig": {
+    "border": true,
+    "rounded": true
+  },
+  "diagnostic.floatConfig": {
+    "border": true,
+    "rounded": true,
+    "highlight": "CocFloating",
+    "borderhighlight": "CocErrorFloat"
+  },
+  "signature.floatConfig": {
+    "border": true,
+    "rounded": true
+  },
+  "hover.floatConfig": {
+    "border": true,
+    "rounded": true
+  }
 }
