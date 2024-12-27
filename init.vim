@@ -26,3 +26,4 @@ nnoremap <leader>rc :e $MYVIMRC<CR>
 
 runtime coc.vim
 runtime fzf.vim
+

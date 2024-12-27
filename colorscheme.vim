@@ -62,6 +62,32 @@ highlight Keyword ctermfg=12
 highlight Tag ctermfg=12
 highlight Delimiter ctermfg=7
 
+highlight typescriptArrowFunc ctermfg=12
+highlight typescriptBraces ctermfg=7
+highlight typescriptDecorator ctermfg=13
+highlight typescriptDotNotation ctermfg=7
+highlight typescriptEnum ctermfg=10
+highlight typescriptEnumKeyword ctermfg=12
+highlight typescriptExport ctermfg=12
+highlight typescriptFuncKeyword ctermfg=12
+highlight typescriptIdentifier ctermfg=11
+highlight typescriptInterfaceKeyword ctermfg=12
+highlight typescriptInterfaceName ctermfg=10
+highlight typescriptInterpolationDelimiter ctermfg=13
+highlight typescriptModule ctermfg=12
+highlight typescriptObjectLabel ctermfg=7
+highlight typescriptParens ctermfg=7
+highlight typescriptPropertySignature ctermfg=7
+highlight typescriptString ctermfg=2
+highlight typescriptStringLiteralType ctermfg=2
+highlight typescriptTemplateSB ctermfg=2
+highlight typescriptTernaryOp ctermfg=13
+highlight typescriptTypeAnnotation ctermfg=7
+highlight typescriptTypeParameter ctermfg=10
+highlight typescriptTypeReference ctermfg=10
+highlight typescriptUnion ctermfg=7
+highlight typescriptVariable ctermfg=11
+
 highlight TabLine ctermfg=7 ctermbg=0
 highlight TabLineSel ctermfg=15 ctermbg=8
 highlight Visual ctermfg=NONE ctermbg=8
@@ -71,25 +97,12 @@ highlight WarningMsg ctermfg=11
 highlight Todo ctermfg=12
 
   
-highlight CocFloating ctermbg=0 ctermfg=15
 highlight CocErrorFloat ctermfg=9 ctermbg=0
-highlight CocWarningFloat ctermfg=11 ctermbg=0
-highlight CocInfoFloat ctermfg=12 ctermbg=0
-highlight CocHintFloat ctermfg=10 ctermbg=0
-
-highlight CocErrorHighlight cterm=undercurl ctermfg=9
-highlight CocWarningHighlight cterm=undercurl ctermfg=11
-highlight CocInfoHighlight cterm=undercurl ctermfg=12
-highlight CocHintHighlight cterm=undercurl ctermfg=10
-
+highlight CocErrorHighlight ctermbg=NONE cterm=undercurl ctermfg=9
 highlight CocFloating ctermbg=0 ctermfg=15
-
-highlight CocErrorFloat ctermfg=9 ctermbg=0
-highlight CocWarningFloat ctermfg=11 ctermbg=0
-highlight CocInfoFloat ctermfg=12 ctermbg=0
 highlight CocHintFloat ctermfg=10 ctermbg=0
-
-highlight CocErrorHighlight cterm=undercurl ctermfg=9
-highlight CocWarningHighlight cterm=undercurl ctermfg=11
-highlight CocInfoHighlight cterm=undercurl ctermfg=12
-highlight CocHintHighlight cterm=undercurl ctermfg=10
+highlight CocHintHighlight ctermbg=NONE cterm=undercurl ctermfg=10
+highlight CocInfoFloat ctermfg=12 ctermbg=0
+highlight CocInfoHighlight ctermbg=NONE cterm=undercurl ctermfg=12
+highlight CocWarningFloat ctermfg=11 ctermbg=0
+highlight CocWarningHighlight ctermbg=NONE cterm=undercurl ctermfg=11
