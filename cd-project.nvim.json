@@ -1,7 +1,0 @@
-[
-  {"path": "/Users/texoport/.config", "name": ".config"}, 
-  {"path": "/Users/texoport/outroute", "name": "Outroute"}, 
-  {"path": "/Users/texoport/@texoport/parseme/", "name": "Parseme"}, 
-  {"path": "/Users/texoport/@texoport/workflow-engine/", "name": "Workflow Engine"}, 
-  {"name": "nvim", "path": "/Users/texoport/.config/nvim"} 
-]
