@@ -9,7 +9,7 @@ let g:coc_global_extensions= [
 \]
 
 inoremap <silent><expr> <TAB>
-      \ coc#pum#visible() ? coc#pum#next(1) :
+    \ coc#pum#visible() ? coc#pum#next(1) :
       \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
 inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
@@ -68,7 +68,7 @@ xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
 
 " Remap keys for applying code actions at the cursor position
-nmap <leader>ca  <Plug>(coc-codeaction-cursor)
+nmap <leader>do  <Plug>(coc-codeaction-cursor)
 " Remap keys for apply code actions affect whole buffer
 nmap <leader>as  <Plug>(coc-codeaction-source)
 " Apply the most preferred quickfix action to fix diagnostic on the current line
