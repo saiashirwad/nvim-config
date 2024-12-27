@@ -1,3 +1,13 @@
+let g:coc_global_extensions= [
+      \ 'coc-tsserver',
+      \ 'coc-json',
+      \ 'coc-vimlsp',
+      \ 'coc-hls',
+      \ 'coc-biome',
+      \ 'coc-marketplace',
+      \ 'coc-pairs',
+\]
+
 inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? coc#pum#next(1) :
       \ CheckBackspace() ? "\<Tab>" :

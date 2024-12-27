@@ -2,6 +2,7 @@ runtime options.vim
 runtime colorscheme.vim
 
 call plug#begin()
+Plug 'folke/flash.nvim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-surround'
