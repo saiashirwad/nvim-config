@@ -1,6 +1,14 @@
 set notermguicolors
 let $TERM = "xterm-256color"
 
+set fillchars+=vert:│
+set fillchars+=horiz:─
+set fillchars+=horizup:┴
+set fillchars+=horizdown:┬
+set fillchars+=vertleft:┤
+set fillchars+=vertright:├
+set fillchars+=verthoriz:┼
+
 colorscheme default
 
 highlight Normal ctermbg=NONE guibg=NONE
@@ -11,6 +19,11 @@ highlight LineNr ctermbg=NONE guibg=NONE ctermfg=7
 highlight CursorLine ctermbg=NONE guibg=NONE
 highlight CursorLineNr ctermbg=NONE guibg=NONE
 highlight Folded ctermbg=NONE guibg=NONE
+
+highlight WinSeparator ctermbg=NONE ctermfg=8 guibg=NONE
+highlight VertSplit ctermbg=NONE ctermfg=8 guibg=NONE
+highlight WinBar ctermbg=NONE
+highlight WinBarNC ctermbg=NONE
 
 highlight Pmenu ctermbg=0 ctermfg=15
 highlight PmenuSel ctermbg=8 ctermfg=15
