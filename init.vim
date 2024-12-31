@@ -4,12 +4,10 @@ nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
-
 nnoremap n nzz
 nnoremap N Nzz
 nnoremap <C-d> <C-d>zz
 nnoremap <C-u> <C-u>zz
-
 inoremap " ""<left>
 inoremap ' ''<left>
 inoremap ( ()<left>
@@ -24,14 +22,11 @@ inoremap { {}<left>
 inoremap {<CR> {<CR>}<ESC>O
 inoremap {;<CR> {<CR>};<ESC>O
 
-set notermguicolors
-set clipboard=unnamedplus
+set notermguicolors clipboard=unnamedplus
 set nobackup noswapfile nowritebackup undofile
 set number relativenumber
 set expandtab shiftwidth=2 softtabstop=2 tabstop=2 ignorecase
-set title
-set splitbelow splitright
-set smartcase
+set title splitbelow splitright smartcase
 
 colorscheme default
 let $TERM = "xterm-256color"
