@@ -1,14 +1,4 @@
-runtime options.vim
-runtime colorscheme.vim
-
-call plug#begin()
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'tpope/vim-sensible'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-vinegar'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-call plug#end()
+runtime surround.vim
 
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
@@ -20,10 +10,37 @@ nnoremap N Nzz
 nnoremap <C-d> <C-d>zz
 nnoremap <C-u> <C-u>zz
 
-nnoremap <leader>bf :!bun biome format --write %<CR>
-nnoremap <leader>gc :sp ~/.config/ghostty/config <CR>
-nnoremap <leader>rc :e $MYVIMRC<CR>
+inoremap " ""<left>
+inoremap ' ''<left>
+inoremap ( ()<left>
+inoremap [ []<left>
+inoremap { {}<left>
+inoremap {<CR> {<CR>}<ESC>O
+inoremap {;<CR> {<CR>};<ESC>Onoremap " ""<left>
+inoremap ' ''<left>
+inoremap ( ()<left>
+inoremap [ []<left>
+inoremap { {}<left>
+inoremap {<CR> {<CR>}<ESC>O
+inoremap {;<CR> {<CR>};<ESC>O
 
-runtime coc.vim
-runtime fzf.vim
+set notermguicolors
+set clipboard=unnamedplus
+set nobackup noswapfile nowritebackup undofile
+set number relativenumber
+set expandtab shiftwidth=2 softtabstop=2 tabstop=2 ignorecase
+set title
+set splitbelow splitright
+set smartcase
 
+colorscheme default
+let $TERM = "xterm-256color"
+
+highlight Normal ctermbg=NONE guibg=NONE
+highlight NonText ctermbg=NONE guibg=NONE
+highlight Function ctermfg=14
+highlight String ctermfg=2
+highlight Boolean ctermfg=9
+highlight Number ctermfg=9
+highlight Keyword ctermfg=12
+highlight Todo ctermfg=12
